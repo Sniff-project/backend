@@ -13,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.KeyPair;
-import java.util.Base64;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -23,7 +20,6 @@ public class AuthService {
     private final UserMapper userMapper;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final KeyPair keyPair;
 
     public AuthResponse signUp(UserSignUp userSignUp) {
         if(userRepository.existsByEmailIgnoreCase(userSignUp.getEmail())) {
@@ -48,9 +44,5 @@ public class AuthService {
 
     private boolean isValidPhone(String phone) {
         return phone.matches("^\\+380\\d{9}$");
-    }
-
-    public String getPublicKey() {
-        return Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
     }
 }

@@ -39,9 +39,4 @@ public class AuthController {
     public AuthResponse signUp(@Valid @RequestBody UserSignUp userSignup) {
         return authService.signUp(userSignup);
     }
-
-    @GetMapping("/public-key")
-    public String getPublicKey() {
-        return authService.getPublicKey();
-    }
 }
