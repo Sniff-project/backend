@@ -6,7 +6,9 @@ import com.sniff.jwt.JwtService;
 import com.sniff.mapper.UserMapper;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
+import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
+import com.sniff.user.model.request.UserSignIn;
 import com.sniff.user.model.request.UserSignUp;
 import com.sniff.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -98,6 +103,43 @@ public class AuthServiceTest {
         userSignup.setPhone("380111111111111");
 
         assertThrows(InvalidPhoneException.class, () -> authService.signUp(userSignup));
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Sign in successfully")
+    public void signInSuccessfully() {
+        when(userRepository.findByEmailIgnoreCase(any())).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(anyLong(), any())).thenReturn("token");
+
+        UserSignIn userSignin = new UserSignIn(user.getEmail(), "qwerty123456789");
+        when(passwordEncoder.matches(userSignin.getPassword(), user.getPassword())).thenReturn(true);
+
+
+        AuthResponse authResponse = authService.signIn(userSignin);
+
+        assertThat(authResponse).isNotNull();
+        assertThat(authResponse.getJwtToken()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Try to sign in with invalid password")
+    public void trySignInWithInvalidPassword() {
+        when(userRepository.findByEmailIgnoreCase(any())).thenReturn(Optional.of(user));
+
+        UserSignIn userSignin = new UserSignIn(user.getEmail(), "another_password");
+        when(passwordEncoder.matches(userSignin.getPassword(), user.getPassword())).thenReturn(false);
+
+        assertThrows(BadCredentialsException.class, () -> authService.signIn(userSignin));
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Try to sign in with invalid email")
+    public void trySignInWithInvalidEmail() {
+        when(userRepository.findByEmailIgnoreCase(any())).thenReturn(Optional.empty());
+
+        UserSignIn userSignin = new UserSignIn("another_email@gmail.com", "qwerty123456789");
+
+        assertThrows(UserNotFoundException.class, () -> authService.signIn(userSignin));
     }
 
     private UserSignUp generateSignupRequest() {
