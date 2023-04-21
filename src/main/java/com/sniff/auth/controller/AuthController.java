@@ -2,6 +2,7 @@ package com.sniff.auth.controller;
 
 import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.service.AuthService;
+import com.sniff.user.model.request.UserSignIn;
 import com.sniff.user.model.request.UserSignUp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,5 +39,24 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse signUp(@Valid @RequestBody UserSignUp userSignup) {
         return authService.signUp(userSignup);
+    }
+
+    @Operation(
+            summary = "Sign in with an email and password",
+            description = "As a user, I want to sign in with my email address so that " +
+                    "I can can use all the options on the site."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = { @Content(schema = @Schema(implementation = AuthResponse.class),
+                            mediaType = "application/json") }),
+            @ApiResponse(responseCode = "404", description = "User with this email not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid email or password", content = @Content)
+    })
+    @PostMapping("/signin")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse signIn(@Valid @RequestBody UserSignIn userSignIn) {
+        return authService.signIn(userSignIn);
     }
 }

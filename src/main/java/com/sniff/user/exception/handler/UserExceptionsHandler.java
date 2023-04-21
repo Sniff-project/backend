@@ -2,8 +2,10 @@ package com.sniff.user.exception.handler;
 
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
+import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.utils.HttpResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,8 +26,17 @@ public class UserExceptionsHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public HttpResponse handlerUsernameNotFoundException(UsernameNotFoundException e) {
+    @ExceptionHandler({
+            UsernameNotFoundException.class,
+            UserNotFoundException.class
+    })
+    public HttpResponse handlerUsernameNotFoundException(RuntimeException e) {
+        return new HttpResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(BadCredentialsException.class)
+    public HttpResponse handlerBadCredentialsException(BadCredentialsException e) {
         return new HttpResponse(e.getMessage());
     }
 }
