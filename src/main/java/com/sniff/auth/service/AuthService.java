@@ -11,7 +11,7 @@ import com.sniff.user.model.entity.User;
 import com.sniff.user.model.request.UserSignIn;
 import com.sniff.user.model.request.UserSignUp;
 import com.sniff.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
