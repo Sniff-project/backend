@@ -7,7 +7,9 @@ import com.sniff.auth.service.AuthService;
 import com.sniff.jwt.JwtService;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
+import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
+import com.sniff.user.model.request.UserSignIn;
 import com.sniff.user.model.request.UserSignUp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebM
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -141,6 +144,68 @@ public class AuthControllerTest {
         response
                 .andDo(print())
                 .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Sign in successfully")
+    public void signInSuccessfully() throws Exception {
+        AuthResponse authResponse = new AuthResponse("token");
+
+        given(jwtService.generateToken(anyLong(), any())).willReturn("token");
+        given(authService.signIn(any())).willReturn(authResponse);
+
+        UserSignIn userSignin = new UserSignIn(user.getEmail(), "qwerty123456789");
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.post("/api/v1/auth/signin")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userSignin)));
+
+        response
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.jwtToken").value("token"));
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Try to sign in with invalid password")
+    public void signInWithInvalidPassword() throws Exception {
+        UserSignIn userSignin = new UserSignIn(user.getEmail(), "another_password");
+
+        given(authService.signIn(any())).willThrow(new BadCredentialsException("Invalid password"));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.post("/api/v1/auth/signin")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userSignin)));
+
+        response
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-1] Try to sign in with invalid email")
+    public void signInWithInvalidEmail() throws Exception {
+        UserSignIn userSignin = new UserSignIn("another_email@gmail.com", "qwerty123456789");
+
+        given(authService.signIn(any()))
+                .willThrow(new UserNotFoundException("User with this email not found"));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.post("/api/v1/auth/signin")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userSignin)));
+
+        response
+                .andDo(print())
+                .andExpect(status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
     }
 
