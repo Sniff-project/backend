@@ -33,7 +33,7 @@ public class AuthController {
                             mediaType = "application/json") }),
             @ApiResponse(responseCode = "409", description = "User already exists with this email/phone number",
                     content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid phone number", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid fields", content = @Content)
     })
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,7 +52,8 @@ public class AuthController {
                             mediaType = "application/json") }),
             @ApiResponse(responseCode = "404", description = "User with this email not found",
                     content = @Content),
-            @ApiResponse(responseCode = "401", description = "Invalid email or password", content = @Content)
+            @ApiResponse(responseCode = "401", description = "Invalid email or password", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid fields", content = @Content)
     })
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)
