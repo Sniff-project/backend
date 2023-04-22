@@ -7,7 +7,6 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Objects;
 
 import static com.sniff.jwt.JwtConstants.*;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -30,16 +29,17 @@ public class JwtService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    public boolean isTokenExpired(String token) {
-        return Instant.now()
-                .isAfter(Objects.requireNonNull(jwtDecoder.decode(token).getExpiresAt()));
-    }
-
     public boolean isTokenValid(String token) {
         try {
-            return StringUtils.isNotEmpty(jwtDecoder.decode(token).getSubject());
+            Jwt jwt = jwtDecoder.decode(token);
+            return StringUtils.isNotEmpty(jwt.getSubject()) && !isTokenExpired(jwt);
         } catch (BadJwtException ex) {
             return false;
         }
+    }
+
+    private boolean isTokenExpired(Jwt jwt){
+        Instant jwtExpiresAt = jwt.getExpiresAt();
+        return jwtExpiresAt == null || Instant.now().isAfter(jwtExpiresAt);
     }
 }
