@@ -27,8 +27,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtService jwtService;
-    private final ObjectMapper objectMapper;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtValidationFilter jwtValidationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,11 +57,10 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .exceptionHandling(c -> c
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint(objectMapper))
-                        .accessDeniedHandler(new JwtAccessDeniedHandler(objectMapper))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
-                .addFilterBefore(new JwtValidationFilter(jwtService, objectMapper),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtValidationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

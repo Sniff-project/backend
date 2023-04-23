@@ -2,6 +2,7 @@ package com.sniff.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sniff.auth.service.AuthVerifyService;
+import com.sniff.jwt.JwtService;
 import com.sniff.user.controller.UserController;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
@@ -36,6 +37,8 @@ public class UserControllerTest {
     private UserService userService;
     @MockBean
     private AuthVerifyService authVerifyService;
+    @MockBean
+    private JwtService jwtService;
     @MockBean
     private PasswordEncoder passwordEncoder;
 
