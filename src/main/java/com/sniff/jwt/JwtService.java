@@ -24,7 +24,7 @@ public class JwtService {
                 .issuedAt(now)
                 .expiresAt(now.plus(EXPIRATION_TIME, MINUTES))
                 .subject(String.valueOf(id))
-                .claim(ROLE_CLAIM, role.getAuthority())
+                .claim(ROLE_CLAIM, role.name())
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
