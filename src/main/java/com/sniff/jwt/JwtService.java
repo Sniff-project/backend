@@ -17,7 +17,7 @@ public class JwtService {
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
 
-    public String generateToken(Long id, Role role) {
+    public String generateToken(Long id, String name, Role role) {
         var now = Instant.now();
         var claims = JwtClaimsSet.builder()
                 .issuer(TOKEN_ISSUER)
@@ -25,6 +25,7 @@ public class JwtService {
                 .expiresAt(now.plus(EXPIRATION_TIME, MINUTES))
                 .subject(String.valueOf(id))
                 .claim(ROLE_CLAIM, role.name())
+                .claim(NAME_CLAIM, name)
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
