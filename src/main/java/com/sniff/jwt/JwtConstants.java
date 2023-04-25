@@ -8,4 +8,5 @@ public class JwtConstants {
     public static final String FORBIDDEN_MESSAGE = "You need to sign in to access this page";
     public static final String TOKEN_ISSUER = "Sniff";
     public static final String ROLE_CLAIM = "role";
+    public static final String NAME_CLAIM = "name";
 }
