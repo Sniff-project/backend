@@ -7,6 +7,7 @@ import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
 import com.sniff.user.model.request.UserUpdate;
+import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
 import com.sniff.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,42 +34,39 @@ public class UserService {
                 : userMapper.toUserProfile(user);
     }
 
-    public UserProfile updateUserProfile(Long id, UserUpdate updatedUser) {
-        User userToUpdate = getUserById(id);
+        public UserFullProfile updateUserProfile(Long id, UserUpdate updatedUser) {
+            User userToUpdate = getUserById(id);
 
-        authVerifyService.verifyAccess(id);
+            authVerifyService.verifyAccess(id);
 
-        if(!userToUpdate.getEmail().equals(updatedUser.getEmail())) {
-            if(userRepository.existsByEmailIgnoreCase(updatedUser.getEmail())) {
-                throw new UserExistsException("User with email " + updatedUser.getEmail() + " already exists");
+            if(!userToUpdate.getEmail().equals(updatedUser.getEmail())) {
+                if(userRepository.existsByEmailIgnoreCase(updatedUser.getEmail())) {
+                    throw new UserExistsException("User with email " + updatedUser.getEmail() + " already exists");
+                }
+                userToUpdate.setEmail(updatedUser.getEmail());
             }
-            userToUpdate.setEmail(updatedUser.getEmail());
+
+            if(!userToUpdate.getPhone().equals(updatedUser.getPhone())) {
+                if(!isValidPhone(updatedUser.getPhone())) {
+                    throw new InvalidPhoneException("Invalid phone number");
+                }
+
+                if(userRepository.existsByPhone(updatedUser.getPhone())) {
+                    throw new UserExistsException("User with phone " + updatedUser.getPhone() + " already exists");
+                }
+                userToUpdate.setPhone(updatedUser.getPhone());
+            }
+
+            userToUpdate.setFirstname(updatedUser.getFirstname());
+            userToUpdate.setLastname(updatedUser.getLastname());
+
+            Optional.ofNullable(updatedUser.getRegion()).ifPresent(userToUpdate::setRegion);
+            Optional.ofNullable(updatedUser.getCity()).ifPresent(userToUpdate::setCity);
+
+            userRepository.save(userToUpdate);
+
+            return userMapper.toUserFullProfile(userToUpdate);
         }
-
-        if(!userToUpdate.getPhone().equals(updatedUser.getPhone())) {
-            if(!isValidPhone(updatedUser.getPhone())) {
-                throw new InvalidPhoneException("Invalid phone number");
-            }
-
-            if(userRepository.existsByPhone(updatedUser.getPhone())) {
-                throw new UserExistsException("User with phone " + updatedUser.getPhone() + " already exists");
-            }
-            userToUpdate.setPhone(updatedUser.getPhone());
-        }
-
-        userToUpdate.setFirstname(updatedUser.getFirstname());
-        userToUpdate.setLastname(updatedUser.getLastname());
-
-        Optional<String> optionalRegion = Optional.ofNullable(updatedUser.getRegion());
-        optionalRegion.ifPresent(userToUpdate::setRegion);
-
-        Optional<String> optionalCity = Optional.ofNullable(updatedUser.getCity());
-        optionalCity.ifPresent(userToUpdate::setCity);
-
-        userRepository.save(userToUpdate);
-
-        return userMapper.toUserFullProfile(userToUpdate);
-    }
 
     private User getUserById(Long id) {
         return userRepository.findById(id)
