@@ -27,8 +27,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,7 +70,7 @@ public class AuthControllerTest {
         UserSignUp userSignup = generateSignupRequest();
         AuthResponse authResponse = new AuthResponse("token");
 
-        given(jwtService.generateToken(anyLong(), any())).willReturn("token");
+        given(jwtService.generateToken(anyLong(),anyString(), any())).willReturn("token");
         given(authService.signUp(any())).willReturn(authResponse);
 
         ResultActions response = mockMvc
@@ -152,7 +151,7 @@ public class AuthControllerTest {
     public void signInSuccessfully() throws Exception {
         AuthResponse authResponse = new AuthResponse("token");
 
-        given(jwtService.generateToken(anyLong(), any())).willReturn("token");
+        given(jwtService.generateToken(anyLong(), anyString(), any())).willReturn("token");
         given(authService.signIn(any())).willReturn(authResponse);
 
         UserSignIn userSignin = new UserSignIn(user.getEmail(), "qwerty123456789");
