@@ -1,5 +1,6 @@
 package com.sniff.user.exception.handler;
 
+import com.sniff.user.exception.InvalidPasswordException;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -20,8 +21,11 @@ public class UserExceptionsHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidPhoneException.class)
-    public HttpResponse handlerInvalidPhoneException(InvalidPhoneException e) {
+    @ExceptionHandler({
+            InvalidPhoneException.class,
+            InvalidPasswordException.class
+    })
+    public HttpResponse handlerInvalidPhoneException(RuntimeException e) {
         return new HttpResponse(e.getMessage());
     }
 
