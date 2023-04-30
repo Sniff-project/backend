@@ -17,6 +17,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.sniff.utils.Validation.isValidPhone;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,9 +32,11 @@ public class AuthService {
         if(userRepository.existsByEmailIgnoreCase(userSignUp.getEmail())) {
             throw new UserExistsException("User with email " + userSignUp.getEmail() + " already exists");
         }
+
         if(!isValidPhone(userSignUp.getPhone())) {
             throw new InvalidPhoneException("Invalid phone number");
         }
+
         if(userRepository.existsByPhone(userSignUp.getPhone())) {
             throw new UserExistsException("User with phone " + userSignUp.getPhone() + " already exists");
         }
@@ -57,9 +61,5 @@ public class AuthService {
 
         String jwtToken = jwtService.generateToken(user.getId(), user.getRole());
         return new AuthResponse(jwtToken);
-    }
-
-    private boolean isValidPhone(String phone) {
-        return phone.matches("^\\+380\\d{9}$");
     }
 }

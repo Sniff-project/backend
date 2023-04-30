@@ -17,6 +17,6 @@ public class UserSignIn {
     private String email;
 
     @NotBlank(message = "Password shouldn't be blank")
-    @Size(min = 6, max = 20, message = "Password should be between 6 and 20 characters")
+    @Size(min = 8, max = 20, message = "Password should be between 8 and 20 characters")
     private String password;
 }

@@ -3,16 +3,14 @@ package com.sniff.user.model.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @Builder
-public class UserSignUp {
+public class UserUpdate {
     @NotBlank(message = "Firstname shouldn't be blank")
     @Size(min = 2, max = 30, message = "Firstname should be between 2 and 30 characters")
     private String firstname;
@@ -30,7 +28,7 @@ public class UserSignUp {
     @Size(min = 10, max = 15, message = "Phone should be between 10 and 15 characters")
     private String phone;
 
-    @NotBlank(message = "Password shouldn't be blank")
-    @Size(min = 8, max = 20, message = "Password should be between 8 and 20 characters")
-    private String password;
+    private String region;
+
+    private String city;
 }

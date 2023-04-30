@@ -1,9 +1,11 @@
 package com.sniff.user;
 
+import com.sniff.auth.exception.DeniedAccessException;
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.UserMapper;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
+import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
 import com.sniff.user.repository.UserRepository;
@@ -24,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,4 +92,47 @@ public class UserServiceTest {
         assertThrows(UserNotFoundException.class, () -> userService.getUserProfileById(user.getId()));
     }
 
+    @Test
+    @DisplayName("[Sprint-2] Update own profile successfully")
+    public void editOwnProfileSuccessfully() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+
+        when(userMapper.toUserFullProfile(any())).thenReturn(new UserFullProfile());
+
+        UserUpdate userUpdate = generateUpdateRequest();
+
+        UserProfile userProfile = userService.updateUserProfile(user.getId(), userUpdate);
+
+        assertThat(userProfile).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try update someone else profile")
+    public void editSomeoneElseProfile() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        willThrow(DeniedAccessException.class).given(authVerifyService).verifyAccess(user.getId());
+
+        assertThrows(DeniedAccessException.class,
+                () -> userService.updateUserProfile(user.getId(), generateUpdateRequest()));
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to update non-existent user profile")
+    public void editNonExistentUserProfile() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class,
+                () -> userService.updateUserProfile(user.getId(), generateUpdateRequest()));
+    }
+
+    private UserUpdate generateUpdateRequest(){
+        return UserUpdate.builder()
+                .firstname("John")
+                .lastname("Doe")
+                .email("johndoe@example.com")
+                .phone("+380111111111")
+                .region("Ukraine")
+                .city("Kiev")
+                .build();
+    }
 }
