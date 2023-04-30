@@ -25,7 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +64,7 @@ public class AuthServiceTest {
     @DisplayName("[Sprint-1] Sign up successfully")
     public void signUpSuccessfully() {
         when(userRepository.save(any())).thenReturn(user);
-        when(jwtService.generateToken(anyLong(), anyString(), any())).thenReturn("token");
+        when(jwtService.generateToken(anyLong(), any())).thenReturn("token");
 
         UserSignUp userSignup = generateSignupRequest();
         when(userMapper.toUser(userSignup)).thenReturn(user);
@@ -108,7 +109,7 @@ public class AuthServiceTest {
     @DisplayName("[Sprint-1] Sign in successfully")
     public void signInSuccessfully() {
         when(userRepository.findByEmailIgnoreCase(any())).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(anyLong(), anyString(), any())).thenReturn("token");
+        when(jwtService.generateToken(anyLong(), any())).thenReturn("token");
 
         UserSignIn userSignin = new UserSignIn(user.getEmail(), "qwerty123456789");
         when(passwordEncoder.matches(userSignin.getPassword(), user.getPassword())).thenReturn(true);
