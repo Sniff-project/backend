@@ -4,7 +4,6 @@ import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.role.Role;
 import com.sniff.jwt.JwtService;
 import com.sniff.mapper.UserMapper;
-import com.sniff.user.exception.InvalidPasswordException;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
