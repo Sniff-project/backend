@@ -1,5 +1,7 @@
 package com.sniff.user.controller;
 
+import com.sniff.auth.model.AuthResponse;
+import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
 import com.sniff.user.service.UserService;
@@ -13,7 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +54,30 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserProfile getUserProfile(@PathVariable Long id) {
         return userService.getUserProfileById(id);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Update user profile",
+            description = "As a user, I want to edit my profile information to keep it up to date"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = { @Content(schema = @Schema(implementation = UserFullProfile.class),
+                            mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Invalid fields",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "409", description = "User already exists with this email/phone number",
+                    content = @Content)
+    })
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserFullProfile updateUserProfile(@PathVariable Long id,
+                                         @Valid @RequestBody UserUpdate updatedUser) {
+        return userService.updateUserProfile(id, updatedUser);
     }
 }
