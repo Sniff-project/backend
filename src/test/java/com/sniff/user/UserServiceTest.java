@@ -5,6 +5,7 @@ import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.UserMapper;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
+import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -125,6 +127,70 @@ public class UserServiceTest {
                 () -> userService.updateUserProfile(user.getId(), generateUpdateRequest()));
     }
 
+    @Test
+    @DisplayName("[Sprint-2] Change password successfully")
+    public void changePasswordSuccessfully() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        PasswordUpdate passwordUpdate = generatePasswordUpdateRequest();
+
+        when(passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword()))
+                .thenReturn(true);
+
+        userService.changePassword(user.getId(), passwordUpdate);
+
+        assertThat(user.getPassword()).isEqualTo(passwordEncoder.encode("newPassword"));
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change password with wrong current password")
+    public void changePasswordWithWrongCurrentPassword() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        PasswordUpdate passwordUpdate = generatePasswordUpdateRequest();
+
+        when(passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword()))
+                .thenReturn(false);
+
+        assertThrows(BadCredentialsException.class,
+                () -> userService.changePassword(user.getId(), passwordUpdate));
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change password with same current password")
+    public void changePasswordWithSameCurrentPassword() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        PasswordUpdate passwordUpdate = generatePasswordUpdateRequest();
+
+        when(passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword()))
+                .thenReturn(true);
+
+        when(passwordEncoder.matches(passwordUpdate.getNewPassword(), user.getPassword()))
+                .thenReturn(true);
+
+        assertThrows(BadCredentialsException.class,
+                () -> userService.changePassword(user.getId(), passwordUpdate));
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change someone else's password")
+    public void changeSomeoneElsePassword() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        PasswordUpdate passwordUpdate = generatePasswordUpdateRequest();
+
+        willThrow(DeniedAccessException.class).given(authVerifyService).verifyAccess(user.getId());
+
+        assertThrows(DeniedAccessException.class,
+                () -> userService.changePassword(user.getId(), passwordUpdate));
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change non-existent user's password")
+    public void changeNonExistentUserPassword() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class,
+                () -> userService.changePassword(user.getId(), generatePasswordUpdateRequest()));
+    }
+
     private UserUpdate generateUpdateRequest(){
         return UserUpdate.builder()
                 .firstname("John")
@@ -134,5 +200,9 @@ public class UserServiceTest {
                 .region("Ukraine")
                 .city("Kiev")
                 .build();
+    }
+
+    private PasswordUpdate generatePasswordUpdateRequest(){
+        return new PasswordUpdate("qwerty123456789", "newPassword");
     }
 }

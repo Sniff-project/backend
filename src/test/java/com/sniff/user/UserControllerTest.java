@@ -7,6 +7,7 @@ import com.sniff.jwt.JwtService;
 import com.sniff.user.controller.UserController;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
+import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebM
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -28,8 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -182,6 +183,76 @@ public class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
     }
 
+    @Test
+    @DisplayName("[Sprint-2] Change password successfully")
+    public void changePasswordSuccessfully() throws Exception {
+        willDoNothing().given(userService).changePassword(anyLong(), any(PasswordUpdate.class));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.put("/api/v1/users/{id}/password", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generatePasswordUpdateRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change password with wrong password")
+    public void changePasswordWithWrongCurrentPassword() throws Exception {
+        willThrow(new BadCredentialsException("Wrong password"))
+                .given(userService).changePassword(anyLong(), any(PasswordUpdate.class));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.put("/api/v1/users/{id}/password", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generatePasswordUpdateRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change someone else's password")
+    public void changeSomeoneElsePassword() throws Exception {
+        willThrow(new DeniedAccessException("You have no access to this resource"))
+                .given(userService).changePassword(anyLong(), any(PasswordUpdate.class));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.put("/api/v1/users/{id}/password", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generatePasswordUpdateRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-2] Try to change non-existent user's password")
+    public void changeNonExistentUserPassword() throws Exception {
+        willThrow(new UserNotFoundException("User not found"))
+                .given(userService).changePassword(anyLong(), any(PasswordUpdate.class));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.put("/api/v1/users/{id}/password", user.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generatePasswordUpdateRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
     private UserUpdate generateUpdateRequest(){
         return UserUpdate.builder()
                 .firstname("John")
@@ -191,5 +262,9 @@ public class UserControllerTest {
                 .region("Ukraine")
                 .city("Kiev")
                 .build();
+    }
+
+    private PasswordUpdate generatePasswordUpdateRequest(){
+        return new PasswordUpdate("qwerty123456789", "newPassword");
     }
 }

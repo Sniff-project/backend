@@ -1,6 +1,7 @@
 package com.sniff.user.controller;
 
 import com.sniff.auth.model.AuthResponse;
+import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
@@ -79,5 +80,22 @@ public class UserController {
     public UserFullProfile updateUserProfile(@PathVariable Long id,
                                          @Valid @RequestBody UserUpdate updatedUser) {
         return userService.updateUserProfile(id, updatedUser);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Change user password",
+            description = "As a user, I want to be able to change my password to protect my account."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "Invalid current password " +
+                    "or new password is the same as the current password"),
+    })
+    @PutMapping("/{id}/password")
+    @ResponseStatus(HttpStatus.OK)
+    public void changePassword(@PathVariable Long id,
+                               @Valid @RequestBody PasswordUpdate passwordUpdate) {
+        userService.changePassword(id, passwordUpdate);
     }
 }
