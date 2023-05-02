@@ -184,7 +184,7 @@ public class AuthControllerTest {
 
         response
                 .andDo(print())
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
     }
 
