@@ -52,8 +52,7 @@ public class AuthController {
                             mediaType = "application/json") }),
             @ApiResponse(responseCode = "404", description = "User with this email not found",
                     content = @Content),
-            @ApiResponse(responseCode = "401", description = "Invalid email or password", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid fields", content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid email/password or other fields", content = @Content)
     })
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)
