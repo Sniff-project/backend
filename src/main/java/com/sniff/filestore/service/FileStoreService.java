@@ -1,4 +1,4 @@
-package com.sniff.filestore;
+package com.sniff.filestore.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;

@@ -1,6 +1,6 @@
 package com.sniff.filestore.controller;
 
-import com.sniff.filestore.FileStoreService;
+import com.sniff.filestore.service.FileStoreService;
 import com.sniff.utils.HttpResponse;
 import com.sniff.utils.UrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
