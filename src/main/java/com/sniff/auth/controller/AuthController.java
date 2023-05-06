@@ -4,6 +4,7 @@ import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.service.AuthService;
 import com.sniff.user.model.request.UserSignIn;
 import com.sniff.user.model.request.UserSignUp;
+import com.sniff.utils.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,11 +30,11 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201",
-                    content = { @Content(schema = @Schema(implementation = AuthResponse.class),
-                            mediaType = "application/json") }),
+                    content = { @Content(schema = @Schema(implementation = AuthResponse.class)) }),
             @ApiResponse(responseCode = "409", description = "User already exists with this email/phone number",
-                    content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid fields", content = @Content)
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid fields",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
     })
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,11 +49,11 @@ public class AuthController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200",
-                    content = { @Content(schema = @Schema(implementation = AuthResponse.class),
-                            mediaType = "application/json") }),
+                    content = { @Content(schema = @Schema(implementation = AuthResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "User with this email not found",
-                    content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid email/password or other fields", content = @Content)
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid email/password or other fields",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
     })
     @PostMapping("/signin")
     @ResponseStatus(HttpStatus.OK)

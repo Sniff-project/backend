@@ -6,6 +6,7 @@ import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
 import com.sniff.user.service.UserService;
+import com.sniff.utils.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -49,7 +50,7 @@ public class UserController {
                                             UserFullProfile.class
                                     }))),
             @ApiResponse(responseCode = "404", description = "User not found",
-                    content = @Content)
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
     })
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -64,16 +65,15 @@ public class UserController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200",
-                    content = { @Content(schema = @Schema(implementation = UserFullProfile.class),
-                            mediaType = "application/json") }),
+                    content = { @Content(schema = @Schema(implementation = UserFullProfile.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid fields",
-                    content = @Content),
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
             @ApiResponse(responseCode = "403", description = "Access denied",
-                    content = @Content),
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "User not found",
-                    content = @Content),
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
             @ApiResponse(responseCode = "409", description = "User already exists with this email/phone number",
-                    content = @Content)
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
     })
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -90,7 +90,8 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200"),
             @ApiResponse(responseCode = "400", description = "Invalid current password " +
-                    "or new password is the same as the current password"),
+                    "or new password is the same as the current password",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
     })
     @PutMapping("/{id}/password")
     @ResponseStatus(HttpStatus.OK)
