@@ -1,8 +1,11 @@
 package com.sniff.user.model.entity;
 
 import com.sniff.auth.role.Role;
+import com.sniff.pet.model.entity.Pet;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -43,4 +46,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "role")
     private Role role;
+
+    @OneToMany(mappedBy = "author",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Pet> pets;
 }
