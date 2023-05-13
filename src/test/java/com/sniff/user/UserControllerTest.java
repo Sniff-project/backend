@@ -71,8 +71,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("[Sprint-1] Get user profile when non-authenticated")
     public void getUserProfileWhenNonAuthenticated() throws Exception {
-        UserProfile userProfile = new UserProfile("avatar",
-                "Mark", "Himonov", "region", "city");
+        UserProfile userProfile = new UserProfile(user.getId(), "avatar",
+                "Mark", "Himonov", "region", "city", null);
         given(userService.getUserProfileById(user.getId())).willReturn(userProfile);
         given(authVerifyService.isAuthenticated()).willReturn(false);
 
@@ -89,8 +89,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("[Sprint-1] Get user profile when authenticated")
     public void getUserProfileWhenAuthenticated() throws Exception {
-        UserFullProfile userFullProfile = new UserFullProfile("avatar",
-                "Mark", "Himonov", "region", "city", "email", "phone");
+        UserFullProfile userFullProfile = new UserFullProfile(user.getId(), "avatar",
+                "Mark", "Himonov", "region", "city", null, "email", "phone");
         given(userService.getUserProfileById(user.getId())).willReturn(userFullProfile);
         given(authVerifyService.isAuthenticated()).willReturn(true);
 
@@ -124,11 +124,13 @@ public class UserControllerTest {
     public void updateOwnProfileSuccessfully() throws Exception {
         UserUpdate updateRequest = generateUpdateRequest();
         UserFullProfile userFullProfile = new UserFullProfile(
+                user.getId(),
                 user.getAvatar(),
                 updateRequest.getFirstname(),
                 updateRequest.getLastname(),
                 updateRequest.getRegion(),
                 updateRequest.getCity(),
+                null,
                 updateRequest.getEmail(),
                 updateRequest.getPhone());
         given(authVerifyService.isPersonalProfile(anyLong())).willReturn(true);

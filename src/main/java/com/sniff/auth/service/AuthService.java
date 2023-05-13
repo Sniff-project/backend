@@ -3,7 +3,7 @@ package com.sniff.auth.service;
 import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.role.Role;
 import com.sniff.jwt.JwtService;
-import com.sniff.mapper.UserMapper;
+import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -24,7 +24,7 @@ import static com.sniff.utils.Validation.isValidPhone;
 @Transactional
 public class AuthService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final Mappers mapper;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,7 +41,7 @@ public class AuthService {
             throw new UserExistsException("User with phone " + userSignUp.getPhone() + " already exists");
         }
 
-        User user = userMapper.toUser(userSignUp);
+        User user = mapper.toUser(userSignUp);
         user.setRole(Role.USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

@@ -1,13 +1,19 @@
 package com.sniff.user.model.response;
 
+import com.sniff.pet.model.response.PetProfile;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class UserProfile {
+    private Long id;
+
     private String avatar;
 
     private String firstname;
@@ -17,4 +23,6 @@ public class UserProfile {
     private String region;
 
     private String city;
+
+    private List<PetProfile> petProfiles;
 }

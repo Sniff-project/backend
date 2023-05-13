@@ -1,7 +1,7 @@
 package com.sniff.user.service;
 
 import com.sniff.auth.service.AuthVerifyService;
-import com.sniff.mapper.UserMapper;
+import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -26,7 +26,7 @@ import static com.sniff.utils.Validation.isValidPhone;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final Mappers mappers;
     private final AuthVerifyService authVerifyService;
     private final PasswordEncoder passwordEncoder;
 
@@ -34,8 +34,8 @@ public class UserService {
     public UserProfile getUserProfileById(Long id) {
         User user = getUserById(id);
         return authVerifyService.isAuthenticated()
-                ? userMapper.toUserFullProfile(user)
-                : userMapper.toUserProfile(user);
+                ? mappers.toUserFullProfile(user)
+                : mappers.toUserProfile(user);
     }
 
     public UserFullProfile updateUserProfile(Long id, UserUpdate updatedUser) {
@@ -69,7 +69,7 @@ public class UserService {
 
         userRepository.save(userToUpdate);
 
-        return userMapper.toUserFullProfile(userToUpdate);
+        return mappers.toUserFullProfile(userToUpdate);
     }
 
     public void changePassword(Long id, PasswordUpdate passwordUpdate) {
