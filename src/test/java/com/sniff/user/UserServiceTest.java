@@ -2,7 +2,7 @@ package com.sniff.user;
 
 import com.sniff.auth.exception.DeniedAccessException;
 import com.sniff.auth.service.AuthVerifyService;
-import com.sniff.mapper.UserMapper;
+import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
 import com.sniff.user.model.request.PasswordUpdate;
@@ -36,7 +36,7 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper userMapper;
+    private Mappers mappers;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -66,7 +66,7 @@ public class UserServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
         given(authVerifyService.isAuthenticated()).willReturn(false);
 
-        when(userMapper.toUserProfile(any())).thenReturn(new UserProfile());
+        when(mappers.toUserProfile(any())).thenReturn(new UserProfile());
 
         UserProfile userProfile = userService.getUserProfileById(user.getId());
 
@@ -79,7 +79,7 @@ public class UserServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
         given(authVerifyService.isAuthenticated()).willReturn(true);
 
-        when(userMapper.toUserFullProfile(any())).thenReturn(new UserFullProfile());
+        when(mappers.toUserFullProfile(any())).thenReturn(new UserFullProfile());
 
         UserFullProfile userfullProfile = (UserFullProfile) userService.getUserProfileById(user.getId());
 
@@ -99,7 +99,7 @@ public class UserServiceTest {
     public void editOwnProfileSuccessfully() {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
-        when(userMapper.toUserFullProfile(any())).thenReturn(new UserFullProfile());
+        when(mappers.toUserFullProfile(any())).thenReturn(new UserFullProfile());
 
         UserUpdate userUpdate = generateUpdateRequest();
 
