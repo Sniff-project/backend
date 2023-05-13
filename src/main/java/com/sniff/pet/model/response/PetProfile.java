@@ -3,10 +3,7 @@ package com.sniff.pet.model.response;
 import com.sniff.pet.enums.Gender;
 import com.sniff.pet.enums.PetStatus;
 import com.sniff.user.model.response.UserProfile;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class PetProfile {
     private Long id;
