@@ -3,7 +3,7 @@ package com.sniff.auth;
 import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.service.AuthService;
 import com.sniff.jwt.JwtService;
-import com.sniff.mapper.UserMapper;
+import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -34,7 +34,7 @@ public class AuthServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper userMapper;
+    private Mappers mappers;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -66,7 +66,7 @@ public class AuthServiceTest {
         when(jwtService.generateToken(anyLong(), anyString(), any())).thenReturn("token");
 
         UserSignUp userSignup = generateSignupRequest();
-        when(userMapper.toUser(userSignup)).thenReturn(user);
+        when(mappers.toUser(userSignup)).thenReturn(user);
 
         AuthResponse authResponse = authService.signUp(userSignup);
 
@@ -81,7 +81,7 @@ public class AuthServiceTest {
                 .thenThrow(new UserExistsException("User with this email already exists"));
 
         UserSignUp userSignup = generateSignupRequest();
-        when(userMapper.toUser(userSignup)).thenReturn(user);
+        when(mappers.toUser(userSignup)).thenReturn(user);
 
         assertThrows(UserExistsException.class, () -> authService.signUp(userSignup));
     }
