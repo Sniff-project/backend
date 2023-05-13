@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sniff.auth.exception.DeniedAccessException;
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.jwt.JwtService;
-import com.sniff.pet.model.entity.Pet;
-import com.sniff.pet.model.response.PetProfile;
 import com.sniff.user.controller.UserController;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
@@ -29,10 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
