@@ -1,9 +1,8 @@
 package com.sniff.filestore.controller;
 
-import com.sniff.filestore.enums.FileStoreOperation;
 import com.sniff.filestore.service.FileStoreService;
 import com.sniff.utils.HttpResponse;
-import com.sniff.utils.UrlResponse;
+import com.sniff.utils.UrlModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
@@ -44,7 +43,7 @@ public class FileStoreController {
             summary = "Image upload to user's profile")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Image uploaded",
-                    content = { @Content(schema = @Schema(implementation = UrlResponse.class)) }),
+                    content = { @Content(schema = @Schema(implementation = UrlModel.class)) }),
             @ApiResponse(responseCode = "400", description = "Invalid request",
                     content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }) })
     @PostMapping(
@@ -53,30 +52,46 @@ public class FileStoreController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
-    public UrlResponse uploadUserAvatar(@PathVariable Long id,
-                                        @Parameter(required = true, description = "Image file")
+    public UrlModel uploadUserAvatar(@PathVariable Long id,
+                                     @Parameter(required = true, description = "Image file")
                                    @RequestParam
                                    MultipartFile image){
-        return new UrlResponse(fileStoreService.uploadUserAvatar(id, image));
+        return new UrlModel(fileStoreService.uploadUserAvatar(id, image));
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Image upload to pet's profile")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Image uploaded",
+                    content = { @Content(schema = @Schema(implementation = UrlModel.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }) })
     @PostMapping(
             path = "pets/{id}/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
-    public UrlResponse uploadPetProfilesPhotos(@PathVariable Long id,
-                                        @Parameter(required = true, description = "Image file")
+    public UrlModel uploadPetProfilesPhotos(@PathVariable Long id,
+                                            @Parameter(required = true, description = "Image file")
                                         @RequestParam
                                         List<MultipartFile> images){
-        return new UrlResponse(fileStoreService.uploadPetPhotos(id, images));
+        return new UrlModel(fileStoreService.uploadPetPhotos(id, images));
     }
 
-    @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Delete some images from pet profile")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Images deleted",
+                    content = { @Content(schema = @Schema(implementation = UrlModel.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }) })
+    @DeleteMapping("/pets/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteImages(@PathVariable Long id,
-                             @RequestBody FileStoreOperation operation) {
-        fileStoreService.deleteImageByEntityId(id, operation);
+                             @RequestBody UrlModel urlModel) {
+        fileStoreService.deleteImagesByUrlsAndPetId(id, urlModel);
     }
 }
