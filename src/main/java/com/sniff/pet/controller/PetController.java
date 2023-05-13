@@ -3,8 +3,6 @@ package com.sniff.pet.controller;
 import com.sniff.pet.model.request.PetProfileModify;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.pet.service.PetService;
-import com.sniff.user.model.response.UserFullProfile;
-import com.sniff.user.model.response.UserProfile;
 import com.sniff.utils.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
