@@ -41,7 +41,7 @@ public class FileStoreService {
     private final UserRepository userRepository;
     private final PetRepository petRepository;
     @Value("${max-total-pet-photos}")
-    private static int MAX_TOTAL_PET_PHOTOS;
+    private int MAX_TOTAL_PET_PHOTOS;
 
     public List<String> uploadUserAvatar(Long id, MultipartFile image) {
         validateFile(image);
@@ -67,7 +67,8 @@ public class FileStoreService {
         Pet pet = getPetById(id);
         User user = getUserById(authVerifyService.getIdFromSubject());
         verifyUserContainsPetProfile(user, pet);
-
+        System.out.println(pet.getPhotos().size());
+        System.out.println(images.size());
         if(pet.getPhotos().size() + images.size() > MAX_TOTAL_PET_PHOTOS) {
             throw new FailedToUploadFileException("You can't upload more than 5 photos");
         }
