@@ -3,6 +3,8 @@ package com.sniff.pet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sniff.jwt.JwtService;
 import com.sniff.pet.controller.PetController;
+import com.sniff.pet.exceptions.PetNotBelongingToUserException;
+import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
 import com.sniff.pet.model.response.PetProfile;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import static com.sniff.pet.enums.Gender.MALE;
 import static com.sniff.pet.enums.PetStatus.LOST;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,16 +84,7 @@ public class PetControllerTest {
     @Test
     @DisplayName("[Sprint-3] Create pet profile successfully")
     public void createPetProfileSuccessfully() throws Exception {
-        PetProfile petProfile = PetProfile.builder()
-                .id(pet.getId())
-                .status(pet.getStatus())
-                .name(pet.getName())
-                .latitude(pet.getLatitude())
-                .longitude(pet.getLongitude())
-                .gender(pet.getGender())
-                .foundOrLostDate(pet.getFoundOrLostDate())
-                .description(pet.getDescription())
-                .build();
+        PetProfile petProfile = generatePetProfile();
         given(petService.createPetProfile(any(PetProfileModify.class))).willReturn(petProfile);
 
         ResultActions response = mockMvc
@@ -103,6 +97,76 @@ public class PetControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.status").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Update own pet profile successfully")
+    public void updateOwnPetProfileSuccessfully() throws Exception {
+        PetProfileModify petProfileModify = generateModifyRequest();
+        PetProfile petProfile = generatePetProfile();
+
+        given(petService.updatePetProfile(anyLong(), any(PetProfileModify.class)))
+                .willReturn(petProfile);
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.patch("/api/v1/pets/{id}", pet.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(petProfileModify))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Try update someone else pet profile")
+    public void tryUpdateSomeoneElsePetProfile() throws Exception {
+        given(petService.updatePetProfile(anyLong(), any(PetProfileModify.class)))
+                .willThrow(new PetNotBelongingToUserException("Pet not belonging to user"));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.patch("/api/v1/pets/{id}", pet.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generateModifyRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Try to update non-existent pet profile")
+    public void tryUpdateNonExistentPetProfile() throws Exception {
+        given(petService.updatePetProfile(anyLong(), any(PetProfileModify.class)))
+                .willThrow(new PetNotFoundException("Pet not found"));
+
+        ResultActions response = mockMvc
+                .perform(MockMvcRequestBuilders.patch("/api/v1/pets/{id}", pet.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generateModifyRequest()))
+                        .accept(MediaType.APPLICATION_JSON));
+
+        response
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").exists());
+    }
+
+    private PetProfile generatePetProfile(){
+        return PetProfile.builder()
+                .id(pet.getId())
+                .status(pet.getStatus())
+                .name(pet.getName())
+                .latitude(pet.getLatitude())
+                .longitude(pet.getLongitude())
+                .gender(pet.getGender())
+                .foundOrLostDate(pet.getFoundOrLostDate())
+                .description(pet.getDescription())
+                .build();
     }
 
     private PetProfileModify generateModifyRequest() {

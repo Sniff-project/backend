@@ -2,6 +2,8 @@ package com.sniff.pet;
 
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.Mappers;
+import com.sniff.pet.exceptions.PetNotBelongingToUserException;
+import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
 import com.sniff.pet.model.response.PetProfile;
@@ -25,9 +27,11 @@ import java.util.Optional;
 import static com.sniff.pet.enums.Gender.MALE;
 import static com.sniff.pet.enums.PetStatus.LOST;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PetServiceTest {
@@ -84,6 +88,41 @@ public class PetServiceTest {
         PetProfile petProfile = petService.createPetProfile(generateModifyRequest());
 
         assertThat(petProfile).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Update own pet profile successfully")
+    public void updateOwnPetProfileSuccessfully() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(petRepository.findById(anyLong())).willReturn(Optional.of(pet));
+        user.getPets().add(pet);
+        when(mappers.toPetProfileWithUserFullProfile(any())).thenReturn(new PetProfile());
+
+        PetProfileModify petProfileModify = generateModifyRequest();
+
+        PetProfile petProfile = petService.updatePetProfile(pet.getId(), petProfileModify);
+
+        assertThat(petProfile).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Try update someone else pet profile")
+    public void tryUpdateSomeoneElsePetProfile() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(petRepository.findById(anyLong())).willReturn(Optional.of(pet));
+        user.getPets().clear();
+        pet.setAuthor(null);
+        assertThrows(PetNotBelongingToUserException.class,
+                () -> petService.updatePetProfile(pet.getId(), generateModifyRequest()));
+    }
+
+    @Test
+    @DisplayName("[Sprint-3] Try to update non-existent pet profile")
+    public void tryUpdateNonExistentPetProfile() {
+        given(petRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(PetNotFoundException.class,
+                () -> petService.updatePetProfile(pet.getId(), generateModifyRequest()));
     }
 
     private PetProfileModify generateModifyRequest() {

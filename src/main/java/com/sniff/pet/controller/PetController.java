@@ -64,4 +64,25 @@ public class PetController {
     public PetProfile createPetProfile(@Valid @RequestBody PetProfileModify petProfileModify) {
         return petService.createPetProfile(petProfileModify);
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Update pet profile"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = { @Content(schema = @Schema(implementation = PetProfile.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid fields",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
+            @ApiResponse(responseCode = "403", description = "Access denied",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
+            @ApiResponse(responseCode = "404", description = "Pet not found",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
+    })
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public PetProfile updatePetProfile(@PathVariable Long id,
+                                       @Valid @RequestBody PetProfileModify updatedPet) {
+        return petService.updatePetProfile(id, updatedPet);
+    }
 }

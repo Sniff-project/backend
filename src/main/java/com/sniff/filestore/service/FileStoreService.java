@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.filestore.enums.FileStoreOperation;
 import com.sniff.filestore.exception.FailedToUploadFileException;
+import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.repository.PetRepository;
@@ -39,7 +40,8 @@ public class FileStoreService {
     private final AuthVerifyService authVerifyService;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
-    private final static int MAX_TOTAL_PET_FILES = 5;
+    @Value("${max-total-pet-photos}")
+    private static int MAX_TOTAL_PET_PHOTOS;
 
     public List<String> uploadUserAvatar(Long id, MultipartFile image) {
         validateFile(image);
@@ -66,7 +68,7 @@ public class FileStoreService {
         User user = getUserById(authVerifyService.getIdFromSubject());
         verifyUserContainsPetProfile(user, pet);
 
-        if(pet.getPhotos().size() + images.size() > MAX_TOTAL_PET_FILES) {
+        if(pet.getPhotos().size() + images.size() > MAX_TOTAL_PET_PHOTOS) {
             throw new FailedToUploadFileException("You can't upload more than 5 photos");
         }
 
@@ -166,7 +168,7 @@ public class FileStoreService {
 
     private void verifyUserContainsPetProfile(User user, Pet pet) {
         if(!user.getPets().contains(pet)){
-            throw new UserNotFoundException("User not found");
+            throw new PetNotBelongingToUserException("You can't edit this pet profile");
         }
     }
 
@@ -174,6 +176,4 @@ public class FileStoreService {
         return petRepository.findById(petId)
                 .orElseThrow(() -> new PetNotFoundException("Pet not found"));
     }
-
-
 }
