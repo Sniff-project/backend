@@ -2,19 +2,24 @@ package com.sniff.pet.service;
 
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.Mappers;
+import com.sniff.pagination.PageWithMetadata;
 import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.pet.repository.PetRepository;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
 import com.sniff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +30,12 @@ public class PetService {
     private final UserRepository userRepository;
     private final AuthVerifyService authVerifyService;
     private final Mappers mapper;
+
+    public PageWithMetadata<PetCard> getPetsGallery(int page, int size) {
+        Page<Pet> pets = petRepository.findAll(PageRequest.of(page, size));
+        List<PetCard> petCards = mapper.toPetCards(pets.getContent());
+        return new PageWithMetadata<>(petCards, pets.getTotalPages());
+    }
 
     @Transactional(readOnly = true)
     public PetProfile getPetProfileById(Long id) {
