@@ -1,6 +1,8 @@
 package com.sniff.pet.controller;
 
+import com.sniff.pagination.PageWithMetadata;
 import com.sniff.pet.model.request.PetProfileModify;
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.pet.service.PetService;
 import com.sniff.utils.HttpResponse;
@@ -15,13 +17,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/pets")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Pet", description = "Pet APIs documentation")
 @SecurityScheme(
         name = "bearerAuth",
@@ -33,9 +39,24 @@ import org.springframework.web.bind.annotation.*;
 public class PetController {
     private final PetService petService;
 
-    @Operation(
-            summary = "Get pet profile"
-    )
+    @Operation(summary = "Get pet gallery")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = { @Content(schema = @Schema(implementation = PetCard.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid query params",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
+    })
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public PageWithMetadata<PetCard> getPetsGallery(
+            @Min(value = 0, message = "Page should be greater or equals 0")
+            @RequestParam(defaultValue = "0") int page,
+            @Positive(message = "Size should be positive")
+            @RequestParam(defaultValue = "12") int size) {
+        return petService.getPetsGallery(page, size);
+    }
+
+    @Operation(summary = "Get pet profile")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     content = { @Content(schema = @Schema(implementation = PetProfile.class)) }),
@@ -47,10 +68,9 @@ public class PetController {
     public PetProfile getPetProfile(@PathVariable Long id) {
         return petService.getPetProfileById(id);
     }
+
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(
-            summary = "Create pet profile"
-    )
+    @Operation(summary = "Create pet profile")
     @ApiResponses({
             @ApiResponse(responseCode = "201",
                     content = { @Content(schema = @Schema(implementation = PetProfile.class)) }),
@@ -66,9 +86,7 @@ public class PetController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(
-            summary = "Update pet profile"
-    )
+    @Operation(summary = "Update pet profile")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     content = { @Content(schema = @Schema(implementation = PetProfile.class)) }),

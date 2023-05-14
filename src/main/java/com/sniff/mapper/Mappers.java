@@ -2,6 +2,7 @@ package com.sniff.mapper;
 
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.user.model.entity.User;
 import com.sniff.user.model.request.UserSignUp;
@@ -11,6 +12,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -18,6 +20,19 @@ public interface Mappers {
     User toUser(UserSignUp userSignup);
 
     Pet toPet(PetProfileModify petProfileModify);
+
+    default List<PetCard> toPetCards(List<Pet> pets) {
+        return pets.stream()
+                .map(this::toPetCard)
+                .collect(Collectors.toList());
+    }
+
+    default PetCard toPetCard(Pet pet) {
+        return PetCard.builder()
+                .id(pet.getId())
+                .photo(pet.getPhotos().stream().findFirst().orElse(null))
+                .build();
+    }
 
     @Mapping(source = "author", target = "author", qualifiedByName = "toUserProfileWithoutPetProfiles")
     PetProfile toPetProfileWithUserProfile(Pet pet);
