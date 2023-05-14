@@ -1,5 +1,6 @@
 package com.sniff.pet.exceptions.handler;
 
+import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.utils.HttpResponse;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,12 @@ public class PetExceptionsHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(PetNotFoundException.class)
     public HttpResponse handlerPetNotFoundException(PetNotFoundException e) {
+        return new HttpResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(PetNotBelongingToUserException.class)
+    public HttpResponse handlerPetNotBelongingToUserException(PetNotBelongingToUserException e) {
         return new HttpResponse(e.getMessage());
     }
 }
