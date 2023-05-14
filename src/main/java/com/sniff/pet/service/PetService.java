@@ -2,6 +2,7 @@ package com.sniff.pet.service;
 
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.Mappers;
+import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
@@ -13,6 +14,8 @@ import com.sniff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,24 @@ public class PetService {
         return mapper.toPetProfileWithUserFullProfile(pet);
     }
 
+    public PetProfile updatePetProfile(Long id, PetProfileModify updatedPet) {
+        Pet petToUpdate = getPetById(id);
+        User user = getUserById(authVerifyService.getIdFromSubject());
+        verifyUserContainsPetProfile(user, petToUpdate);
+
+        petToUpdate.setStatus(updatedPet.getStatus());
+        petToUpdate.setName(updatedPet.getName());
+        petToUpdate.setLatitude(updatedPet.getLatitude());
+        petToUpdate.setLongitude(updatedPet.getLongitude());
+        petToUpdate.setGender(updatedPet.getGender());
+        petToUpdate.setFoundOrLostDate(updatedPet.getFoundOrLostDate());
+        Optional.ofNullable(updatedPet.getDescription())
+                .ifPresent(petToUpdate::setDescription);
+
+        petRepository.save(petToUpdate);
+        return mapper.toPetProfileWithUserFullProfile(petToUpdate);
+    }
+
     private User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -49,5 +70,11 @@ public class PetService {
     private Pet getPetById(Long id) {
         return petRepository.findById(id)
                 .orElseThrow(() -> new PetNotFoundException("Pet not found"));
+    }
+
+    private void verifyUserContainsPetProfile(User user, Pet pet) {
+        if(!user.getPets().contains(pet)){
+            throw new PetNotBelongingToUserException("You can't edit this pet profile");
+        }
     }
 }
