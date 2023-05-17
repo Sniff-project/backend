@@ -52,7 +52,9 @@ public class FileStoreService {
         String imageName = getFileNameWithExtension(UUID.randomUUID().toString(), image.getOriginalFilename());
 
         try (InputStream inputStream = compressImage(image)) {
-            deleteAllImagesByEntityId(id, USER);
+            if(user.getAvatar() != null) {
+                deleteAllImagesByEntityId(id, USER);
+            }
             saveImage(objectKey, imageName, inputStream);
             user.setAvatar(generateUrl(id, imageName, USER));
             return Collections.singletonList(user.getAvatar());
