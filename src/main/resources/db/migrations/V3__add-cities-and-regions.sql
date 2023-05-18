@@ -1,0 +1,19 @@
+ALTER TABLE users
+    ALTER COLUMN region DROP NOT NULL,
+    ALTER COLUMN region TYPE BIGINT,
+    ALTER COLUMN city DROP NOT NULL,
+    ALTER COLUMN city TYPE BIGINT;
+
+CREATE TABLE IF NOT EXISTS city (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS region (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50)
+);
+
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_region FOREIGN KEY (region) REFERENCES region (id),
+    ADD CONSTRAINT fk_users_city FOREIGN KEY (city) REFERENCES city (id);

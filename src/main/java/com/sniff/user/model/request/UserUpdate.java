@@ -28,7 +28,7 @@ public class UserUpdate {
     @Size(min = 10, max = 15, message = "Phone should be between 10 and 15 characters")
     private String phone;
 
-    private String region;
+    private Long regionId;
 
-    private String city;
+    private Long cityId;
 }

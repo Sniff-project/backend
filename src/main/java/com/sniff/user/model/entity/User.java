@@ -1,6 +1,8 @@
 package com.sniff.user.model.entity;
 
 import com.sniff.auth.role.Role;
+import com.sniff.location.model.entity.City;
+import com.sniff.location.model.entity.Region;
 import com.sniff.pet.model.entity.Pet;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,11 +36,13 @@ public class User {
     @Column(nullable = false, length = 15, name = "phone")
     private String phone;
 
-    @Column(length = 50, name = "region")
-    private String region;
+    @ManyToOne
+    @JoinColumn(name = "region_id", referencedColumnName = "id")
+    private Region region;
 
-    @Column(length = 50, name = "city")
-    private String city;
+    @ManyToOne
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    private City city;
 
     @Column(nullable = false, name = "password")
     private String password;

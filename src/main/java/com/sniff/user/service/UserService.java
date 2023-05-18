@@ -1,23 +1,27 @@
 package com.sniff.user.service;
 
 import com.sniff.auth.service.AuthVerifyService;
+import com.sniff.location.exception.CityNotFoundException;
+import com.sniff.location.exception.RegionNotFoundException;
 import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
+import com.sniff.location.model.entity.City;
+import com.sniff.location.model.entity.Region;
 import com.sniff.user.model.entity.User;
 import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
 import com.sniff.user.model.response.UserProfile;
+import com.sniff.location.repository.CityRepository;
+import com.sniff.location.repository.RegionRepository;
 import com.sniff.user.repository.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import static com.sniff.utils.Validation.isValidPhone;
 
@@ -28,6 +32,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final Mappers mappers;
     private final AuthVerifyService authVerifyService;
+    private final RegionRepository regionRepository;
+    private final CityRepository cityRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -64,8 +70,16 @@ public class UserService {
         userToUpdate.setFirstname(updatedUser.getFirstname());
         userToUpdate.setLastname(updatedUser.getLastname());
 
-        Optional.ofNullable(updatedUser.getRegion()).ifPresent(userToUpdate::setRegion);
-        Optional.ofNullable(updatedUser.getCity()).ifPresent(userToUpdate::setCity);
+        if(updatedUser.getRegionId() != null){
+            Region region = getRegionById(updatedUser.getRegionId());
+            userToUpdate.setRegion(region);
+            region.getUsers().add(userToUpdate);
+        }
+        if(updatedUser.getCityId() != null){
+            City city = getCityById(updatedUser.getCityId());
+            userToUpdate.setCity(city);
+            city.getUsers().add(userToUpdate);
+        }
 
         userRepository.save(userToUpdate);
 
@@ -91,5 +105,15 @@ public class UserService {
     private User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    private Region getRegionById(Long id) {
+        return regionRepository.findById(id)
+                .orElseThrow(() -> new RegionNotFoundException("Region not found"));
+    }
+
+    private City getCityById(Long id) {
+        return cityRepository.findById(id)
+                .orElseThrow(() -> new CityNotFoundException("City not found"));
     }
 }

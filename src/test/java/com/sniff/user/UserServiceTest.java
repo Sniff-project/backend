@@ -2,6 +2,8 @@ package com.sniff.user;
 
 import com.sniff.auth.exception.DeniedAccessException;
 import com.sniff.auth.service.AuthVerifyService;
+import com.sniff.location.repository.CityRepository;
+import com.sniff.location.repository.RegionRepository;
 import com.sniff.mapper.Mappers;
 import com.sniff.user.exception.UserNotFoundException;
 import com.sniff.user.model.entity.User;
@@ -37,6 +39,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private Mappers mappers;
+    @Mock
+    private RegionRepository regionRepository;
+    @Mock
+    private CityRepository cityRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -197,8 +203,6 @@ public class UserServiceTest {
                 .lastname("Doe")
                 .email("johndoe@example.com")
                 .phone("+380111111111")
-                .region("Ukraine")
-                .city("Kiev")
                 .build();
     }
 
