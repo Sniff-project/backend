@@ -61,8 +61,8 @@ public interface Mappers {
                 .avatar(user.getAvatar())
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
-                .region(user.getRegion())
-                .city(user.getCity())
+                .region(user.getRegion() != null ? user.getRegion().getName() : null)
+                .city(user.getCity() != null ? user.getCity().getName() : null)
                 .build();
     }
 
@@ -81,8 +81,8 @@ public interface Mappers {
         userFullProfile.setAvatar(user.getAvatar());
         userFullProfile.setFirstname(user.getFirstname());
         userFullProfile.setLastname(user.getLastname());
-        userFullProfile.setRegion(user.getRegion());
-        userFullProfile.setCity(user.getCity());
+        userFullProfile.setRegion(user.getRegion() != null ? user.getRegion().getName() : null);
+        userFullProfile.setCity(user.getCity() != null ? user.getCity().getName() : null);
         userFullProfile.setEmail(user.getEmail());
         userFullProfile.setPhone(user.getPhone());
         return userFullProfile;
