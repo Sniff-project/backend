@@ -128,8 +128,8 @@ public class UserControllerTest {
                 user.getAvatar(),
                 updateRequest.getFirstname(),
                 updateRequest.getLastname(),
-                updateRequest.getRegion(),
-                updateRequest.getCity(),
+                "region",
+                "city",
                 null,
                 updateRequest.getEmail(),
                 updateRequest.getPhone());
@@ -261,8 +261,8 @@ public class UserControllerTest {
                 .lastname("Doe")
                 .email("johndoe@example.com")
                 .phone("+380111111111")
-                .region("Ukraine")
-                .city("Kiev")
+                .regionId(1L)
+                .cityId(1L)
                 .build();
     }
 
