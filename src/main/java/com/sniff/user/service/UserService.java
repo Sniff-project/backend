@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static com.sniff.utils.Validation.isValidPhone;
 
 @Service
@@ -70,16 +72,17 @@ public class UserService {
         userToUpdate.setFirstname(updatedUser.getFirstname());
         userToUpdate.setLastname(updatedUser.getLastname());
 
-        if(updatedUser.getRegionId() != null){
-            Region region = getRegionById(updatedUser.getRegionId());
-            userToUpdate.setRegion(region);
-            region.getUsers().add(userToUpdate);
-        }
-        if(updatedUser.getCityId() != null){
-            City city = getCityById(updatedUser.getCityId());
-            userToUpdate.setCity(city);
-            city.getUsers().add(userToUpdate);
-        }
+        Optional<Region> optionalRegion = Optional.ofNullable(updatedUser.getRegionId())
+                .map(this::getRegionById);
+        userToUpdate.setRegion(optionalRegion.orElse(null));
+
+        Optional<City> optionalCity = Optional.ofNullable(updatedUser.getCityId())
+                .map(this::getCityById);
+        userToUpdate.setCity(optionalCity.orElse(null));
+
+        optionalRegion.ifPresent(region -> region.getUsers().add(userToUpdate));
+        optionalCity.ifPresent(city -> city.getUsers().add(userToUpdate));
+
 
         userRepository.save(userToUpdate);
 
