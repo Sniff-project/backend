@@ -171,11 +171,11 @@ public class PetControllerTest {
 
     private PetProfileModify generateModifyRequest() {
         return PetProfileModify.builder()
-                .status(LOST)
+                .status(String.valueOf(LOST))
                 .name("Pet")
                 .latitude("latitude")
                 .longitude("longitude")
-                .gender(MALE)
+                .gender(String.valueOf(MALE))
                 .foundOrLostDate(LocalDate.now())
                 .description("Description")
                 .build();

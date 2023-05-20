@@ -1,5 +1,7 @@
-package com.sniff.utils.exception;
+package com.sniff.utils.exception.handler;
 
+import com.sniff.utils.HttpResponse;
+import com.sniff.utils.exception.InvalidEnumValueException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
@@ -36,6 +38,12 @@ public class ValidationExceptionsHandler {
                         violation -> getFieldNameFromPath(violation.getPropertyPath()),
                         ConstraintViolation::getMessage
                 ));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidEnumValueException.class)
+    public HttpResponse handlerInvalidEnumValueException(InvalidEnumValueException e) {
+        return new HttpResponse(e.getMessage());
     }
 
     private String getFieldNameFromPath(Path propertyPath) {

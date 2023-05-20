@@ -2,6 +2,7 @@ package com.sniff.pet.model.request;
 
 import com.sniff.pet.enums.Gender;
 import com.sniff.pet.enums.PetStatus;
+import com.sniff.utils.enums.ValidEnumValue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class PetProfileModify {
-    @NotNull(message = "Status should not be empty")
-    private PetStatus status;
+    @ValidEnumValue(enumClass = PetStatus.class)
+    private String status;
 
     @NotBlank(message = "Name should not be empty")
     private String name;
@@ -28,8 +29,8 @@ public class PetProfileModify {
     @NotBlank(message = "Longitude should not be empty")
     private String longitude;
 
-    @NotNull(message = "Gender should not be empty")
-    private Gender gender;
+    @ValidEnumValue(enumClass = Gender.class)
+    private String gender;
 
     @NotNull(message = "Date should not be empty")
     private LocalDate foundOrLostDate;

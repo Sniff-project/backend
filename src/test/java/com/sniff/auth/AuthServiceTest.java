@@ -55,7 +55,7 @@ public class AuthServiceTest {
                 .lastname("Himonov")
                 .email("mark@gmail.com")
                 .phone("+380111111111")
-                .password(passwordEncoder.encode("qwerty123456789"))
+                .password(passwordEncoder.encode("Qwerty123@!"))
                 .build();
     }
 
@@ -147,7 +147,7 @@ public class AuthServiceTest {
                 .lastname(user.getLastname())
                 .email(user.getEmail())
                 .phone(user.getPhone())
-                .password(user.getPassword())
+                .password("Qwerty123@!")
                 .build();
     }
 }

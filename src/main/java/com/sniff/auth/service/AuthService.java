@@ -4,6 +4,7 @@ import com.sniff.auth.model.AuthResponse;
 import com.sniff.auth.role.Role;
 import com.sniff.jwt.JwtService;
 import com.sniff.mapper.Mappers;
+import com.sniff.user.exception.InvalidPasswordException;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.sniff.utils.Validation.isValidPassword;
 import static com.sniff.utils.Validation.isValidPhone;
 
 @Service
@@ -29,21 +31,29 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthResponse signUp(UserSignUp userSignUp) {
-        if(userRepository.existsByEmailIgnoreCase(userSignUp.getEmail())) {
-            throw new UserExistsException("User with email " + userSignUp.getEmail() + " already exists");
+        String email = userSignUp.getEmail();
+        String phone = userSignUp.getPhone();
+        String password = userSignUp.getPassword();
+
+        if(userRepository.existsByEmailIgnoreCase(email)) {
+            throw new UserExistsException("User with email " + email + " already exists");
         }
 
-        if(!isValidPhone(userSignUp.getPhone())) {
+        if(!isValidPhone(phone)) {
             throw new InvalidPhoneException("Invalid phone number");
         }
 
-        if(userRepository.existsByPhone(userSignUp.getPhone())) {
-            throw new UserExistsException("User with phone " + userSignUp.getPhone() + " already exists");
+        if(!isValidPassword(password)) {
+            throw new InvalidPasswordException("The password must contain: A-z, 0-9, ! @ # $ % ^ & *() ?.");
+        }
+
+        if(userRepository.existsByPhone(phone)) {
+            throw new UserExistsException("User with phone " + phone + " already exists");
         }
 
         User user = mapper.toUser(userSignUp);
         user.setRole(Role.USER);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
 

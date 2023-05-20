@@ -62,7 +62,7 @@ public class UserServiceTest {
                 .lastname("Himonov")
                 .email("mark@gmail.com")
                 .phone("+380111111111")
-                .password(passwordEncoder.encode("qwerty123456789"))
+                .password(passwordEncoder.encode("Qwerty123@!"))
                 .build();
     }
 
@@ -207,6 +207,6 @@ public class UserServiceTest {
     }
 
     private PasswordUpdate generatePasswordUpdateRequest(){
-        return new PasswordUpdate("qwerty123456789", "newPassword");
+        return new PasswordUpdate("Qwerty123@!", "NewPassword123@!");
     }
 }

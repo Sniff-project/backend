@@ -3,6 +3,8 @@ package com.sniff.pet.service;
 import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.mapper.Mappers;
 import com.sniff.pagination.PageWithMetadata;
+import com.sniff.pet.enums.Gender;
+import com.sniff.pet.enums.PetStatus;
 import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
 import com.sniff.pet.model.entity.Pet;
@@ -60,11 +62,11 @@ public class PetService {
         User user = getUserById(authVerifyService.getIdFromSubject());
         verifyUserContainsPetProfile(user, petToUpdate);
 
-        petToUpdate.setStatus(updatedPet.getStatus());
+        petToUpdate.setStatus(PetStatus.valueOf(updatedPet.getStatus()));
         petToUpdate.setName(updatedPet.getName());
         petToUpdate.setLatitude(updatedPet.getLatitude());
         petToUpdate.setLongitude(updatedPet.getLongitude());
-        petToUpdate.setGender(updatedPet.getGender());
+        petToUpdate.setGender(Gender.valueOf(updatedPet.getGender()));
         petToUpdate.setFoundOrLostDate(updatedPet.getFoundOrLostDate());
         Optional.ofNullable(updatedPet.getDescription())
                 .ifPresent(petToUpdate::setDescription);
