@@ -26,7 +26,7 @@ public class UserExceptionsHandler {
             InvalidPasswordException.class,
             BadCredentialsException.class
     })
-    public HttpResponse handlerInvalidPhoneException(RuntimeException e) {
+    public HttpResponse handlerBadRequestException(RuntimeException e) {
         return new HttpResponse(e.getMessage());
     }
 
