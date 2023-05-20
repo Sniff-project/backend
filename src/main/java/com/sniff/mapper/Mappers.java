@@ -1,5 +1,7 @@
 package com.sniff.mapper;
 
+import com.sniff.pet.enums.Gender;
+import com.sniff.pet.enums.PetStatus;
 import com.sniff.pet.model.entity.Pet;
 import com.sniff.pet.model.request.PetProfileModify;
 import com.sniff.pet.model.response.PetCard;
@@ -19,7 +21,17 @@ import java.util.stream.Collectors;
 public interface Mappers {
     User toUser(UserSignUp userSignup);
 
-    Pet toPet(PetProfileModify petProfileModify);
+    default Pet toPet(PetProfileModify petProfileModify){
+        return Pet.builder()
+                .status(PetStatus.valueOf(petProfileModify.getStatus()))
+                .name(petProfileModify.getName())
+                .latitude(petProfileModify.getLatitude())
+                .longitude(petProfileModify.getLongitude())
+                .gender(Gender.valueOf(petProfileModify.getGender()))
+                .foundOrLostDate(petProfileModify.getFoundOrLostDate())
+                .description(petProfileModify.getDescription())
+                .build();
+    }
 
     default List<PetCard> toPetCards(List<Pet> pets) {
         return pets.stream()
