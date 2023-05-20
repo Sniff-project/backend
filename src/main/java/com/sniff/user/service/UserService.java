@@ -4,6 +4,7 @@ import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.location.exception.CityNotFoundException;
 import com.sniff.location.exception.RegionNotFoundException;
 import com.sniff.mapper.Mappers;
+import com.sniff.user.exception.InvalidPasswordException;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
 import com.sniff.user.exception.UserNotFoundException;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static com.sniff.utils.Validation.isValidPassword;
 import static com.sniff.utils.Validation.isValidPhone;
 
 @Service
@@ -48,25 +50,27 @@ public class UserService {
 
     public UserFullProfile updateUserProfile(Long id, UserUpdate updatedUser) {
         User userToUpdate = getUserById(id);
-
         authVerifyService.verifyAccess(id);
 
-        if (!userToUpdate.getEmail().equals(updatedUser.getEmail())) {
-            if (userRepository.existsByEmailIgnoreCase(updatedUser.getEmail())) {
-                throw new UserExistsException("User with email " + updatedUser.getEmail() + " already exists");
+        String email = updatedUser.getEmail();
+        String phone = updatedUser.getPhone();
+
+        if (!userToUpdate.getEmail().equals(email)) {
+            if (userRepository.existsByEmailIgnoreCase(email)) {
+                throw new UserExistsException("User with email " + email + " already exists");
             }
-            userToUpdate.setEmail(updatedUser.getEmail());
+            userToUpdate.setEmail(email);
         }
 
-        if (!userToUpdate.getPhone().equals(updatedUser.getPhone())) {
-            if (!isValidPhone(updatedUser.getPhone())) {
+        if (!userToUpdate.getPhone().equals(phone)) {
+            if (!isValidPhone(phone)) {
                 throw new InvalidPhoneException("Invalid phone number");
             }
 
-            if (userRepository.existsByPhone(updatedUser.getPhone())) {
-                throw new UserExistsException("User with phone " + updatedUser.getPhone() + " already exists");
+            if (userRepository.existsByPhone(phone)) {
+                throw new UserExistsException("User with phone " + phone + " already exists");
             }
-            userToUpdate.setPhone(updatedUser.getPhone());
+            userToUpdate.setPhone(phone);
         }
 
         userToUpdate.setFirstname(updatedUser.getFirstname());
@@ -93,11 +97,19 @@ public class UserService {
         User user = getUserById(id);
         authVerifyService.verifyAccess(id);
 
-        if(!passwordEncoder.matches(passwordUpdate.getCurrentPassword(), user.getPassword())) {
+        String currentPassword = passwordUpdate.getCurrentPassword();
+        String newPassword = passwordUpdate.getNewPassword();
+        String hashedPassword = user.getPassword();
+
+        if(!isValidPassword(currentPassword) || !isValidPassword(newPassword)) {
+            throw new InvalidPasswordException("The password must contain: A-z, 0-9, ! @ # $ % ^ & *() ?.");
+        }
+
+        if(!passwordEncoder.matches(currentPassword, hashedPassword)) {
             throw new BadCredentialsException("Invalid current password");
         }
 
-        if(passwordEncoder.matches(passwordUpdate.getNewPassword(), user.getPassword())) {
+        if(passwordEncoder.matches(newPassword, hashedPassword)) {
             throw new BadCredentialsException("New password cannot be the same as current password");
         }
 
