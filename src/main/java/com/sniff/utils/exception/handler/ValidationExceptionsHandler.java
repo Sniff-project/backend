@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +46,15 @@ public class ValidationExceptionsHandler {
     public HttpResponse handlerInvalidEnumValueException(InvalidEnumValueException e) {
         return new HttpResponse(e.getMessage());
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put(e.getName(), "Invalid query parameter");
+        return errorMap;
+    }
+
 
     private String getFieldNameFromPath(Path propertyPath) {
         String fullPath = propertyPath.toString();

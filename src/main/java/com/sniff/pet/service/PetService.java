@@ -18,6 +18,7 @@ import com.sniff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +34,11 @@ public class PetService {
     private final AuthVerifyService authVerifyService;
     private final Mappers mapper;
 
-    public PageWithMetadata<PetCard> getPetsGallery(int page, int size) {
-        Page<Pet> pets = petRepository.findAll(PageRequest.of(page, size));
+    public PageWithMetadata<PetCard> getPetsGallery(int page, int size, PetStatus status) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Pet> pets = (status == null)
+                ? petRepository.findAll(pageable)
+                : petRepository.findAllByStatus(pageable, status);
         List<PetCard> petCards = mapper.toPetCards(pets.getContent());
         return new PageWithMetadata<>(petCards, pets.getTotalPages());
     }

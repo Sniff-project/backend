@@ -1,11 +1,13 @@
 package com.sniff.pet.controller;
 
 import com.sniff.pagination.PageWithMetadata;
+import com.sniff.pet.enums.PetStatus;
 import com.sniff.pet.model.request.PetProfileModify;
 import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.pet.service.PetService;
 import com.sniff.utils.HttpResponse;
+import com.sniff.utils.enums.ValidEnumValue;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -52,8 +54,10 @@ public class PetController {
             @Min(value = 0, message = "Page should be greater or equals 0")
             @RequestParam(defaultValue = "0") int page,
             @Positive(message = "Size should be positive")
-            @RequestParam(defaultValue = "12") int size) {
-        return petService.getPetsGallery(page, size);
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false)
+            PetStatus status) {
+        return petService.getPetsGallery(page, size, status);
     }
 
     @Operation(summary = "Get pet profile")
