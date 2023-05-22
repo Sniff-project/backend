@@ -43,6 +43,7 @@ public interface Mappers {
         return PetCard.builder()
                 .id(pet.getId())
                 .photo(pet.getPhotos().stream().findFirst().orElse(null))
+                .name(pet.getName())
                 .build();
     }
 
