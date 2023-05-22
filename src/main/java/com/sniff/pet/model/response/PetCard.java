@@ -10,4 +10,5 @@ import lombok.*;
 public class PetCard {
     private Long id;
     private String photo;
+    private String name;
 }
