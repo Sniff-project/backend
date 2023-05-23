@@ -6,6 +6,6 @@ public class Validation {
     }
 
     public static boolean isValidPassword(String password) {
-        return password.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=])(?!.*\\s).{8,}$");
+        return password.matches("^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()\\?]).{8,}$");
     }
 }
