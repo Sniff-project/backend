@@ -1,6 +1,7 @@
 package com.sniff.location.exception.handler;
 
 import com.sniff.location.exception.CityNotFoundException;
+import com.sniff.location.exception.MissingLocationException;
 import com.sniff.location.exception.RegionNotFoundException;
 import com.sniff.utils.HttpResponse;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,12 @@ public class LocationExceptionsHandler {
             RegionNotFoundException.class
     })
     public HttpResponse handlerLocationNotFoundException(RuntimeException e) {
+        return new HttpResponse(e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingLocationException.class)
+    public HttpResponse handlerMissingLocationException(MissingLocationException e) {
         return new HttpResponse(e.getMessage());
     }
 }
