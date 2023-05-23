@@ -1,6 +1,8 @@
 package com.sniff.pet;
 
 import com.sniff.auth.service.AuthVerifyService;
+import com.sniff.location.model.entity.City;
+import com.sniff.location.model.entity.Region;
 import com.sniff.mapper.Mappers;
 import com.sniff.pet.exceptions.PetNotBelongingToUserException;
 import com.sniff.pet.exceptions.PetNotFoundException;
@@ -63,6 +65,8 @@ public class PetServiceTest {
                 .phone("+380111111111")
                 .password(passwordEncoder.encode("qwerty123456789"))
                 .pets(new ArrayList<>())
+                .region(new Region(1L, "Region", null))
+                .city(new City(1L, "City", null))
                 .build();
         pet = Pet.builder()
                 .id(1L)
