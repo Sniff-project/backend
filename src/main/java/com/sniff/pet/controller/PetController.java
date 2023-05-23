@@ -7,7 +7,6 @@ import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import com.sniff.pet.service.PetService;
 import com.sniff.utils.HttpResponse;
-import com.sniff.utils.enums.ValidEnumValue;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -56,8 +55,12 @@ public class PetController {
             @Positive(message = "Size should be positive")
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false)
-            PetStatus status) {
-        return petService.getPetsGallery(page, size, status);
+            PetStatus status,
+            @RequestParam(required = false)
+            Long regionId,
+            @RequestParam(required = false)
+            Long cityId) {
+        return petService.getPetsGallery(page, size, status, regionId, cityId);
     }
 
     @Operation(summary = "Get pet profile")
@@ -78,7 +81,7 @@ public class PetController {
     @ApiResponses({
             @ApiResponse(responseCode = "201",
                     content = { @Content(schema = @Schema(implementation = PetProfile.class)) }),
-            @ApiResponse(responseCode = "400", description = "Invalid fields",
+            @ApiResponse(responseCode = "400", description = "Invalid fields or you need to set location before creating a pet profile",
                     content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
             @ApiResponse(responseCode = "403", description = "Access denied",
                     content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
