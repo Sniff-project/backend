@@ -67,6 +67,11 @@ public class FileStoreService {
         validateFiles(images);
 
         Pet pet = getPetById(id);
+
+        if(pet.getPhotos() != null && !pet.getPhotos().isEmpty()) {
+            deleteAllImagesByEntityId(id, PET);
+        }
+
         User user = getUserById(authVerifyService.getIdFromSubject());
         verifyUserContainsPetProfile(user, pet);
         System.out.println(pet.getPhotos().size());
