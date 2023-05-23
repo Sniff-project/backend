@@ -1,6 +1,7 @@
 package com.sniff.pet.service;
 
 import com.sniff.auth.service.AuthVerifyService;
+import com.sniff.location.exception.MissingLocationException;
 import com.sniff.mapper.Mappers;
 import com.sniff.pagination.PageWithMetadata;
 import com.sniff.pet.enums.Gender;
@@ -18,7 +19,6 @@ import com.sniff.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +34,12 @@ public class PetService {
     private final AuthVerifyService authVerifyService;
     private final Mappers mapper;
 
-    public PageWithMetadata<PetCard> getPetsGallery(int page, int size, PetStatus status) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Pet> pets = (status == null)
-                ? petRepository.findAll(pageable)
-                : petRepository.findAllByStatus(pageable, status);
+    public PageWithMetadata<PetCard> getPetsGallery(int page, int size, PetStatus status, Long regionId, Long cityId) {
+        Page<Pet> pets = petRepository.findPetsByStatusRegionAndCity(status, regionId, cityId, PageRequest.of(page, size));
         List<PetCard> petCards = mapper.toPetCards(pets.getContent());
         return new PageWithMetadata<>(petCards, pets.getTotalPages());
     }
+
 
     @Transactional(readOnly = true)
     public PetProfile getPetProfileById(Long id) {
@@ -53,6 +51,9 @@ public class PetService {
 
     public PetProfile createPetProfile(PetProfileModify petProfileModify) {
         User user = getUserById(authVerifyService.getIdFromSubject());
+        if(user.getRegion() == null || user.getCity() == null) {
+            throw new MissingLocationException("You need to set your location before creating a pet profile");
+        }
         Pet pet = mapper.toPet(petProfileModify);
         pet.setAuthor(user);
         petRepository.save(pet);
