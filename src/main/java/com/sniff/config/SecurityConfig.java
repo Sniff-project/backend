@@ -1,8 +1,6 @@
 package com.sniff.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sniff.jwt.JwtValidationFilter;
-import com.sniff.jwt.JwtService;
 import com.sniff.jwt.handler.JwtAccessDeniedHandler;
 import com.sniff.jwt.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +48,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(POST, "/api/v1/auth/**").permitAll()
-                        .requestMatchers(GET, "/api/v1/users/**", "/api/v1/pets/**").permitAll()
+                        .requestMatchers(GET, "/api/v1/users/**", "/api/v1/pets/**", "/api/v1/location/**").permitAll()
                         .requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
