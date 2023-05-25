@@ -81,9 +81,7 @@ public interface Mappers {
 
     default UserProfile toUserProfile(User user) {
         UserProfile userProfile = toUserProfileWithoutPetProfiles(user);
-        userProfile.setPetProfiles(user.getPets().stream()
-                        .map(this::toPetProfileWithoutUserProfile)
-                        .collect(Collectors.toList()));
+        userProfile.setPetCards(toPetCards(user.getPets()));
         return userProfile;
     }
 
@@ -103,9 +101,7 @@ public interface Mappers {
 
     default UserFullProfile toUserFullProfile(User user) {
         UserFullProfile userFullProfile = toUserFullProfileWithoutPetProfiles(user);
-        userFullProfile.setPetProfiles(user.getPets().stream()
-                .map(this::toPetProfileWithoutUserProfile)
-                .collect(Collectors.toList()));
+        userFullProfile.setPetCards(toPetCards(user.getPets()));
         return userFullProfile;
     }
 }
