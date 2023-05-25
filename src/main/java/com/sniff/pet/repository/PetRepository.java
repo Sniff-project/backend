@@ -11,9 +11,11 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Query("SELECT p FROM pet p " +
             "WHERE (:status IS NULL OR p.status = :status) " +
             "AND (:regionId IS NULL OR p.author.region.id = :regionId) " +
-            "AND (:cityId IS NULL OR p.author.city.id = :cityId)")
+            "AND (:cityId IS NULL OR p.author.city.id = :cityId) " +
+            "ORDER BY p.id DESC")
     Page<Pet> findPetsByStatusRegionAndCity(PetStatus status,
                                             Long regionId,
                                             Long cityId,
                                             Pageable pageable);
+
 }
