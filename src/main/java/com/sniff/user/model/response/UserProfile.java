@@ -1,6 +1,6 @@
 package com.sniff.user.model.response;
 
-import com.sniff.pet.model.response.PetProfile;
+import com.sniff.pet.model.response.PetCard;
 import lombok.*;
 
 import java.util.List;
@@ -24,5 +24,5 @@ public class UserProfile {
 
     private String city;
 
-    private List<PetProfile> petProfiles;
+    private List<PetCard> petCards;
 }
