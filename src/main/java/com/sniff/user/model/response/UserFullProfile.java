@@ -1,5 +1,6 @@
 package com.sniff.user.model.response;
 
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.pet.model.response.PetProfile;
 import lombok.*;
 
@@ -22,10 +23,10 @@ public class UserFullProfile extends UserProfile {
                            String lastname,
                            String region,
                            String city,
-                           List<PetProfile> pets,
+                           List<PetCard> petCards,
                            String email,
                            String phone) {
-        super(id, avatar, firstname, lastname, region, city, pets);
+        super(id, avatar, firstname, lastname, region, city, petCards);
         this.email = email;
         this.phone = phone;
     }
