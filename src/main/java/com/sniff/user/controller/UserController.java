@@ -1,6 +1,5 @@
 package com.sniff.user.controller;
 
-import com.sniff.auth.model.AuthResponse;
 import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
@@ -18,7 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,5 +97,18 @@ public class UserController {
     public void changePassword(@PathVariable Long id,
                                @Valid @RequestBody PasswordUpdate passwordUpdate) {
         userService.changePassword(id, passwordUpdate);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Delete user")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204"),
+            @ApiResponse(responseCode = "403", description = "Access denied",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) }),
+    })
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 }

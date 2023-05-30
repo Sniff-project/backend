@@ -117,6 +117,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void deleteUser(Long id) {
+        authVerifyService.verifyAccess(id);
+        userRepository.deleteById(id);
+    }
+
     private User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
