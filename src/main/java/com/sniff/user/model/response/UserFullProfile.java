@@ -23,10 +23,9 @@ public class UserFullProfile extends UserProfile {
                            String lastname,
                            String region,
                            String city,
-                           List<PetCard> petCards,
                            String email,
                            String phone) {
-        super(id, avatar, firstname, lastname, region, city, petCards);
+        super(id, avatar, firstname, lastname, region, city);
         this.email = email;
         this.phone = phone;
     }
