@@ -72,7 +72,7 @@ public class UserControllerTest {
     @DisplayName("[Sprint-1] Get user profile when non-authenticated")
     public void getUserProfileWhenNonAuthenticated() throws Exception {
         UserProfile userProfile = new UserProfile(user.getId(), "avatar",
-                "Mark", "Himonov", "region", "city", null);
+                "Mark", "Himonov", "region", "city");
         given(userService.getUserProfileById(user.getId())).willReturn(userProfile);
         given(authVerifyService.isAuthenticated()).willReturn(false);
 
@@ -90,7 +90,7 @@ public class UserControllerTest {
     @DisplayName("[Sprint-1] Get user profile when authenticated")
     public void getUserProfileWhenAuthenticated() throws Exception {
         UserFullProfile userFullProfile = new UserFullProfile(user.getId(), "avatar",
-                "Mark", "Himonov", "region", "city", null, "email", "phone");
+                "Mark", "Himonov", "region", "city", "email", "phone");
         given(userService.getUserProfileById(user.getId())).willReturn(userFullProfile);
         given(authVerifyService.isAuthenticated()).willReturn(true);
 
@@ -130,7 +130,6 @@ public class UserControllerTest {
                 updateRequest.getLastname(),
                 "region",
                 "city",
-                null,
                 updateRequest.getEmail(),
                 updateRequest.getPhone());
         given(authVerifyService.isPersonalProfile(anyLong())).willReturn(true);

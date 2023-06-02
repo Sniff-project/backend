@@ -47,28 +47,14 @@ public interface Mappers {
                 .build();
     }
 
-    @Mapping(source = "author", target = "author", qualifiedByName = "toUserProfileWithoutPetProfiles")
+    @Mapping(source = "author", target = "author", qualifiedByName = "toUserProfile")
     PetProfile toPetProfileWithUserProfile(Pet pet);
 
-    @Mapping(source = "author", target = "author", qualifiedByName = "toUserFullProfileWithoutPetProfiles")
+    @Mapping(source = "author", target = "author", qualifiedByName = "toUserFullProfile")
     PetProfile toPetProfileWithUserFullProfile(Pet pet);
 
-    default PetProfile toPetProfileWithoutUserProfile(Pet pet) {
-        return PetProfile.builder()
-                .id(pet.getId())
-                .status(pet.getStatus())
-                .photos(pet.getPhotos())
-                .name(pet.getName())
-                .latitude(pet.getLatitude())
-                .longitude(pet.getLongitude())
-                .gender(pet.getGender())
-                .foundOrLostDate(pet.getFoundOrLostDate())
-                .description(pet.getDescription())
-                .build();
-    }
-
-    @Named("toUserProfileWithoutPetProfiles")
-    default UserProfile toUserProfileWithoutPetProfiles(User user) {
+    @Named("toUserProfile")
+    default UserProfile toUserProfile(User user) {
         return UserProfile.builder()
                 .id(user.getId())
                 .avatar(user.getAvatar())
@@ -79,14 +65,8 @@ public interface Mappers {
                 .build();
     }
 
-    default UserProfile toUserProfile(User user) {
-        UserProfile userProfile = toUserProfileWithoutPetProfiles(user);
-        userProfile.setPetCards(toPetCards(user.getPets()));
-        return userProfile;
-    }
-
-    @Named("toUserFullProfileWithoutPetProfiles")
-    default UserFullProfile toUserFullProfileWithoutPetProfiles(User user) {
+    @Named("toUserFullProfile")
+    default UserFullProfile toUserFullProfile(User user) {
         UserFullProfile userFullProfile = new UserFullProfile();
         userFullProfile.setId(user.getId());
         userFullProfile.setAvatar(user.getAvatar());
@@ -96,12 +76,6 @@ public interface Mappers {
         userFullProfile.setCity(user.getCity() != null ? user.getCity().getName() : null);
         userFullProfile.setEmail(user.getEmail());
         userFullProfile.setPhone(user.getPhone());
-        return userFullProfile;
-    }
-
-    default UserFullProfile toUserFullProfile(User user) {
-        UserFullProfile userFullProfile = toUserFullProfileWithoutPetProfiles(user);
-        userFullProfile.setPetCards(toPetCards(user.getPets()));
         return userFullProfile;
     }
 }

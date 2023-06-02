@@ -1,5 +1,8 @@
 package com.sniff.user.controller;
 
+import com.sniff.pagination.PageWithMetadata;
+import com.sniff.pet.enums.PetStatus;
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.user.model.request.PasswordUpdate;
 import com.sniff.user.model.request.UserUpdate;
 import com.sniff.user.model.response.UserFullProfile;
@@ -17,12 +20,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/v1/users")
 @Tag(name = "User", description = "User APIs documentation")
 @SecurityScheme(
@@ -55,6 +62,25 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserProfile getUserProfile(@PathVariable Long id) {
         return userService.getUserProfileById(id);
+    }
+
+    @Operation(summary = "Get user's pet cards")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = { @Content(schema = @Schema(implementation = PetCard.class)) }),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = { @Content(schema = @Schema(implementation = HttpResponse.class)) })
+    })
+    @GetMapping("/{id}/pets")
+    @ResponseStatus(HttpStatus.OK)
+    public PageWithMetadata<PetCard> getUserPetCards(
+            @PathVariable Long id,
+            @Min(value = 0, message = "Page should be greater or equals 0")
+            @RequestParam(defaultValue = "0") int page,
+            @Positive(message = "Size should be positive")
+            @RequestParam(defaultValue = "3") int size,
+            @RequestParam(required = false) PetStatus status) {
+        return userService.getUserPetCards(id, page, size, status);
     }
 
     @SecurityRequirement(name = "bearerAuth")

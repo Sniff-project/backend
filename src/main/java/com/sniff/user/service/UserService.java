@@ -4,6 +4,10 @@ import com.sniff.auth.service.AuthVerifyService;
 import com.sniff.location.exception.CityNotFoundException;
 import com.sniff.location.exception.RegionNotFoundException;
 import com.sniff.mapper.Mappers;
+import com.sniff.pagination.PageWithMetadata;
+import com.sniff.pet.enums.PetStatus;
+import com.sniff.pet.model.entity.Pet;
+import com.sniff.pet.model.response.PetCard;
 import com.sniff.user.exception.InvalidPasswordException;
 import com.sniff.user.exception.InvalidPhoneException;
 import com.sniff.user.exception.UserExistsException;
@@ -18,12 +22,15 @@ import com.sniff.user.model.response.UserProfile;
 import com.sniff.location.repository.CityRepository;
 import com.sniff.location.repository.RegionRepository;
 import com.sniff.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.sniff.utils.Validation.isValidPassword;
@@ -46,6 +53,14 @@ public class UserService {
         return authVerifyService.isAuthenticated()
                 ? mappers.toUserFullProfile(user)
                 : mappers.toUserProfile(user);
+    }
+
+    @Transactional(readOnly = true)
+    public PageWithMetadata<PetCard> getUserPetCards(Long id, int page, int size, PetStatus status) {
+        validateUserExists(id);
+        Page<Pet> pets = userRepository.getUserPetCards(id, status, PageRequest.of(page, size));
+        List<PetCard> petCards = mappers.toPetCards(pets.getContent());
+        return new PageWithMetadata<>(petCards, pets.getTotalPages());
     }
 
     public UserFullProfile updateUserProfile(Long id, UserUpdate updatedUser) {
@@ -135,5 +150,11 @@ public class UserService {
     private City getCityById(Long id) {
         return cityRepository.findById(id)
                 .orElseThrow(() -> new CityNotFoundException("City not found"));
+    }
+
+    private void validateUserExists(Long id) {
+        if(!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found");
+        }
     }
 }
