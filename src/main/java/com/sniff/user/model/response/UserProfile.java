@@ -1,9 +1,6 @@
 package com.sniff.user.model.response;
 
-import com.sniff.pet.model.response.PetCard;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -23,6 +20,4 @@ public class UserProfile {
     private String region;
 
     private String city;
-
-    private List<PetCard> petCards;
 }
